@@ -1,4 +1,5 @@
 #version 450
+#include "intersec.glsl"
 
 layout(location = 0) in vec2 inPosition;
 layout(location = 1) in vec3 inColour;
@@ -12,18 +13,12 @@ layout (binding = 0) uniform Uniform {
   float sphereRadius;
 } u;
 
-
-struct Hit {
-  bool did_hit;
-  float distance;
+struct Light {
+  vec3 position;
 };
 
-struct Ray {
- vec3 origin;
- vec3 direction;
- float tmin;
- float tmax;
-};
+Light light;
+
 
 Hit check_intersect(Ray ray) {
   vec3 center =  u.spherePosition;
@@ -68,6 +63,8 @@ Hit check_intersect(Ray ray) {
 }
 
 void main() {
+  light.position = vec3(0, -9, -9);
+
   gl_Position = vec4(inPosition, 0.0, 1.0); // Copy 2D position to 3D + depth
   gl_Position.x = gl_Position.x * (WIDTH / HEIGHT);
 
@@ -82,7 +79,20 @@ void main() {
 
   // ray-sphere intersection
   Hit hit = check_intersect(ray);
-  if (hit.did_hit) {
-    fragColour = vec3(1, 1, 1);
+  if (hit.did_hit) { // we hit the sphere
+    // send ray from sphere to light
+    vec3 hitPoint = ray.origin + ray.direction*hit.distance;
+    vec3 sphere_light_dir = normalize(light.position - hitPoint);
+    Ray shadowRay; shadowRay.origin = hitPoint; shadowRay.direction = sphere_light_dir;
+
+    Hit tmpHit = check_intersect(shadowRay);
+    if (tmpHit.did_hit) { // we have hit so we are in shadow do not color
+      fragColour = vec3(0,0,0);
+      return;
+    }
+    // we did directly hit light compute simple light energy
+    float light_intensity = dot(ray.direction, sphere_light_dir);
+
+    fragColour = vec3(1, 1, 1)*light_intensity;
   }
 }

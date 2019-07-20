@@ -131,7 +131,7 @@ int main() {
     // Read the pushConstants example first.
     // 
     Uniform u;
-    u.spherePosition = {-3,0,-3};
+    u.spherePosition = {0,0,-7};
     u.sphereRadius = 1;
     int frame = 0;
 
@@ -164,7 +164,7 @@ int main() {
     while (!glfwWindowShouldClose(glfwwindow)) {
         glfwPollEvents();
 
-        //u.spherePosition = glm::rotate(u.spherePosition, glm::radians(1.0f), glm::vec3(0, 1, 0));
+        u.spherePosition = glm::rotate(u.spherePosition, glm::radians(1.0f), glm::vec3(0, 1, 0));
         // u.colour.r = std::sin(frame * 0.01f);
         float val = 2*M_PI*(frame % 1000) / 1000.0;
         //u.spherePosition = rot* glm::vec3{0, 0, -10};

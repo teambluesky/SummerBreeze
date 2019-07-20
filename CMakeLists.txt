@@ -17,9 +17,9 @@ target_link_libraries(app glfw ${Vulkan_LIBRARY})
 
 message("compiling shaders...")
 execute_process (
-    COMMAND bash -c "glslangValidator -V ${CMAKE_CURRENT_SOURCE_DIR}/shaders/helloTriangle.vert"
+    COMMAND bash -c "glslc ${CMAKE_CURRENT_SOURCE_DIR}/shaders/helloTriangle.vert -o vert.spv"
 )
 
 execute_process (
-    COMMAND bash -c "glslangValidator -V ${CMAKE_CURRENT_SOURCE_DIR}/shaders/helloTriangle.frag"
+    COMMAND bash -c "glslc ${CMAKE_CURRENT_SOURCE_DIR}/shaders/helloTriangle.frag -o frag.spv"
 )
