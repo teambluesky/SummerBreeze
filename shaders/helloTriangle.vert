@@ -17,12 +17,18 @@ struct Light {
   vec3 position;
 };
 
+struct Sphere {
+  vec3 position;
+  float radius;
+};
+
+
 Light light;
 
 
-Hit check_intersect(Ray ray) {
-  vec3 center =  u.spherePosition;
-  float radius = u.sphereRadius;
+Hit check_intersect(Ray ray, Sphere sphere) {
+  vec3 center =  sphere.position;
+  float radius = sphere.radius;
   float radius2 = radius * radius;
 
   vec3 L = center - ray.origin;
@@ -77,15 +83,18 @@ void main() {
 
   fragColour = vec3(0, 0, 0);
 
+  // build scene
+  Sphere sphere; sphere.radius = u.sphereRadius; sphere.position = u.spherePosition;
+
   // ray-sphere intersection
-  Hit hit = check_intersect(ray);
+  Hit hit = check_intersect(ray, sphere);
   if (hit.did_hit) { // we hit the sphere
     // send ray from sphere to light
     vec3 hitPoint = ray.origin + ray.direction*hit.distance;
     vec3 sphere_light_dir = normalize(light.position - hitPoint);
     Ray shadowRay; shadowRay.origin = hitPoint; shadowRay.direction = sphere_light_dir;
 
-    Hit tmpHit = check_intersect(shadowRay);
+    Hit tmpHit = check_intersect(shadowRay, sphere);
     if (tmpHit.did_hit) { // we have hit so we are in shadow do not color
       fragColour = vec3(0,0,0);
       return;

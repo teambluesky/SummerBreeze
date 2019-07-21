@@ -18,6 +18,60 @@
 #include <glm/ext.hpp> // for rotate()
 #include <glm/gtx/rotate_vector.hpp>
 
+#define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
+#include "include/tiny_obj_loader.h"
+
+void load_obj(std::string filename) {
+  tinyobj::attrib_t attrib;
+  std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> materials;
+
+  std::string warn;
+  std::string err;
+
+  bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
+
+  if (!warn.empty()) {
+    std::cout << warn << std::endl;
+  }
+
+  if (!err.empty()) {
+    std::cerr << err << std::endl;
+  }
+  if (!ret) return;
+  // Loop over shapes
+  for (size_t s = 0; s < shapes.size(); s++) {
+    // Loop over faces(polygon)
+    size_t index_offset = 0;
+    for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+      int fv = shapes[s].mesh.num_face_vertices[f];
+
+      // Loop over vertices in the face.
+      for (size_t v = 0; v < fv; v++) {
+        // access to vertex
+        tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+        tinyobj::real_t vx = attrib.vertices[3*idx.vertex_index+0];
+        tinyobj::real_t vy = attrib.vertices[3*idx.vertex_index+1];
+        tinyobj::real_t vz = attrib.vertices[3*idx.vertex_index+2];
+        tinyobj::real_t nx = attrib.normals[3*idx.normal_index+0];
+        tinyobj::real_t ny = attrib.normals[3*idx.normal_index+1];
+        tinyobj::real_t nz = attrib.normals[3*idx.normal_index+2];
+        //tinyobj::real_t tx = attrib.texcoords[2*idx.texcoord_index+0];
+        //tinyobj::real_t ty = attrib.texcoords[2*idx.texcoord_index+1];
+        // Optional: vertex colors
+        // tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
+        // tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
+        // tinyobj::real_t blue = attrib.colors[3*idx.vertex_index+2];
+      }
+      index_offset += fv;
+
+      // per-face material
+      shapes[s].mesh.material_ids[f];
+    }
+  }
+}
+
+
 struct Uniform {
     glm::vec3 spherePosition;
     glm::float32 sphereRadius;
@@ -164,7 +218,7 @@ int main() {
     while (!glfwWindowShouldClose(glfwwindow)) {
         glfwPollEvents();
 
-        u.spherePosition = glm::rotate(u.spherePosition, glm::radians(1.0f), glm::vec3(0, 1, 0));
+        u.spherePosition = glm::rotate(u.spherePosition, glm::radians(1.0f), glm::vec3(0, 1, -5));
         // u.colour.r = std::sin(frame * 0.01f);
         float val = 2*M_PI*(frame % 1000) / 1000.0;
         //u.spherePosition = rot* glm::vec3{0, 0, -10};
@@ -184,7 +238,7 @@ int main() {
             // Like pushConstants(), this takes a copy of the uniform buffer
             // at the time we create this command buffer.
             cb.updateBuffer(
-            ubo.buffer(), 0, sizeof(u), (const void*)&u
+              ubo.buffer(), 0, sizeof(u), (const void*)&u
             );
             // We may or may not need this barrier. It is probably a good precaution.
             // ubo.barrier(
