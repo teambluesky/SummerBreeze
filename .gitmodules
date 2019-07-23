@@ -1,6 +1,3 @@
-[submodule "Vookoo"]
-	path = Vookoo
-	url = https://github.com/andy-thomason/Vookoo
 [submodule "ext/glfw"]
 	path = ext/glfw
 	url = https://github.com/glfw/glfw
