@@ -3,6 +3,6 @@
 ### Build
 - `mkdir build`
 - `cd build`
-- `cmake -D CMAKE_BUILD_TYPE=[Debug|Release] ../`
+- `cmake -D CMAKE_CXX_COMPILER=g++-8 ../`
 - `make`
 - `./app`

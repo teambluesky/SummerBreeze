@@ -1,6 +1,11 @@
 cmake_minimum_required (VERSION 3.2)
 project (SummerBreeze_RT)
 
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
+  MESSAGE(FATAL_ERROR "Please use gcc >= 8.0, by setting `-D CMAKE_CXX_COMPILER=g++-8`" flag)
+  return()
+endif()
+
 add_subdirectory(ext/glfw)
 include_directories(ext/glm)
 
